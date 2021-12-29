@@ -4,6 +4,7 @@
 .todo-item {
   .checkbox {
     width: 20px;
+    cursor: pointer;
 
     svg {
       color: $gray-400;

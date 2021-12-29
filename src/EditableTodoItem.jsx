@@ -1,6 +1,7 @@
 import cn from "classnames";
 import PropTypes from "prop-types";
 import React from "react";
+import { Draggable } from "react-beautiful-dnd";
 import { Button } from "react-bootstrap";
 
 import CheckCircleOutline from "./icons/CheckCircleOutline";
@@ -13,6 +14,7 @@ const propTypes = {
   done: PropTypes.bool,
   onSave: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
+  index: PropTypes.number.isRequired,
 };
 
 
@@ -44,23 +46,27 @@ export default class EditableTodoItem extends React.Component {
 
   render() {
     return (
-      <li className="list-group-item todo-item d-flex">
-        <div>
-          <span className={cn("checkbox", { done: this.props.done }, "disabled")}>
-            <CheckCircleOutline />
-          </span>
-        </div>
-        <div className="todo-text-input">
-          <input type="text" value={this.state.text} onChange={this.setText} />
-        </div>
-        <div>
-          <Button variant="success" onClick={this.onSave}>Save</Button>
-        </div>
-        <div>
-          <Button variant="danger" onClick={this.props.onDelete}>Delete</Button>
-        </div>
-      </li>
-    )
+      <Draggable draggableId={`todo-item-${this.props.index}`} index={this.props.index}>
+        {(provided) => (
+          <li className="list-group-item todo-item d-flex" {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+            <div>
+              <span className={cn("checkbox", { done: this.props.done }, "disabled")}>
+                <CheckCircleOutline />
+              </span>
+            </div>
+            <div className="todo-text-input">
+              <input type="text" value={this.state.text} onChange={this.setText} />
+            </div>
+            <div>
+              <Button variant="success" onClick={this.onSave}>Save</Button>
+            </div>
+            <div>
+              <Button variant="danger" onClick={this.props.onDelete}>Delete</Button>
+            </div>
+          </li>
+        )}
+      </Draggable>
+    );
   }
 }
 
