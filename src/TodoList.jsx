@@ -1,4 +1,5 @@
 import React from "react";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { Button } from "react-bootstrap";
 
 import { clearAllTodos, createTodo, deleteTodo, loadTodos, updateTodo } from "./db";
@@ -19,6 +20,7 @@ export default class TodoList extends React.Component {
     this.addNewRow = this.addNewRow.bind(this);
     this.saveTodo = this.saveTodo.bind(this);
     this.deleteTodo = this.deleteTodo.bind(this);
+    this.onDragEnd = this.onDragEnd.bind(this);
 
     this.state = {
       todos: null,
@@ -80,6 +82,13 @@ export default class TodoList extends React.Component {
     }
   }
 
+  onDragEnd(result) {
+    const todos = [...this.state.todos];
+    const [ movedTodo ] = todos.splice(result.source.index, 1);
+    todos.splice(result.destination.index, 0, movedTodo);
+    this.setState({ todos });
+  }
+
   componentDidMount() {
     this.loadTodos();
   }
@@ -89,31 +98,39 @@ export default class TodoList extends React.Component {
       return <h2>Loading</h2>
     }
     return (
-      <div>
-        <ul className="list-group">
-          {this.state.todos.map((t, i) => {
-            let TodoItemComponent = TodoItem;
-            if (t.editable) {
-              TodoItemComponent = EditableTodoItem;
-            }
-            return (
-              <TodoItemComponent 
-                key={`todo-item-${i}`} 
-                text={t.text} 
-                done={t.done} 
-                toggleDone={() => this.toggleTodoDone(i)} 
-                onSave={(text) => this.saveTodo(i, text)}
-                onDelete={() => this.deleteTodo(i)}
-              />
-            );
-          })}
-        </ul>
-        <div className="button-group d-flex justify-content-center mt-3">
-          <Button variant="success" className="mx-1" onClick={this.addNewRow}>Create</Button>
-          <Button variant="primary" className="mx-1" onClick={this.seedDatabase}>Seed</Button>
-          <Button variant="danger" className="mx-1" onClick={this.clearDatabase}>Clear</Button>
+      <DragDropContext onDragEnd={this.onDragEnd}>
+        <div>
+          <Droppable droppableId="todo-list">
+            {(provided) => (
+              <ul className="list-group" {...provided.droppableProps} ref={provided.innerRef}>
+                {this.state.todos.map((t, i) => {
+                  let TodoItemComponent = TodoItem;
+                  if (t.editable) {
+                    TodoItemComponent = EditableTodoItem;
+                  }
+                  return (
+                    <TodoItemComponent 
+                      key={`todo-item-${i}`} 
+                      text={t.text} 
+                      done={t.done} 
+                      toggleDone={() => this.toggleTodoDone(i)} 
+                      onSave={(text) => this.saveTodo(i, text)}
+                      onDelete={() => this.deleteTodo(i)}
+                      index={i}
+                    />
+                  );
+                })}
+                {provided.placeholder}
+              </ul>
+            )}
+          </Droppable>
+          <div className="button-group d-flex justify-content-center mt-3">
+            <Button variant="success" className="mx-1" onClick={this.addNewRow}>Create</Button>
+            <Button variant="primary" className="mx-1" onClick={this.seedDatabase}>Seed</Button>
+            <Button variant="danger" className="mx-1" onClick={this.clearDatabase}>Clear</Button>
+          </div>
         </div>
-      </div>
-    )
+      </DragDropContext>
+    );
   }
 }

@@ -1,6 +1,7 @@
 import cn from "classnames";
 import PropTypes from "prop-types";
 import React from "react";
+import { Draggable } from "react-beautiful-dnd";
 
 import CheckCircleOutline from "./icons/CheckCircleOutline";
 
@@ -11,17 +12,22 @@ const propTypes = {
   text: PropTypes.string.isRequired,
   done: PropTypes.bool.isRequired,
   toggleDone: PropTypes.func.isRequired,
+  index: PropTypes.number.isRequired,
 };
 
 
-const TodoItem = ({ text, done, toggleDone }) => {
+const TodoItem = ({ text, done, toggleDone, index }) => {
   return (
-    <li className="list-group-item todo-item">
-      <span className={cn("checkbox", { done })} onClick={toggleDone}>
-        <CheckCircleOutline />
-      </span>
-      <span className="text">{text}</span>
-    </li>
+    <Draggable draggableId={`todo-item-${index}`} index={index}>
+      {(provided) => (
+        <li className="list-group-item todo-item" {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+          <span className={cn("checkbox", { done })} onClick={toggleDone}>
+            <CheckCircleOutline />
+          </span>
+          <span className="text">{text}</span>
+        </li>
+      )}
+    </Draggable>
   )
 }
 
