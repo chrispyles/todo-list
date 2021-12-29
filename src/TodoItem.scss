@@ -1,0 +1,29 @@
+@import "~bootstrap/scss/bootstrap";
+
+
+.todo-item {
+  .checkbox {
+    width: 20px;
+
+    svg {
+      color: $gray-400;
+    }
+
+    &.done svg {
+      color: $cyan-900;
+    }
+
+    &.disabled svg,
+    &.done.disabled svg {
+      color: white;
+    }
+  }
+
+  .todo-text-input {
+    flex-grow: 1;
+
+    input {
+      width: 100%;
+    }
+  }
+}
